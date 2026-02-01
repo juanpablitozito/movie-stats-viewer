@@ -349,7 +349,7 @@ section button:hover {
   background-repeat: no-repeat;
   background-position: center;
   position: relative;
-   
+
 }
 
 .modal-content {
@@ -379,23 +379,35 @@ section button:hover {
 }
 
 .btn-trailer {
-  padding: 10px 20px;
-  background-color: var(--button-color);
-  /* border: 1px solid white; */
-  border-radius: 1px;
-  font-weight: bold;
-  font-size: 14px;
-  box-shadow: var(--sombra);
-  border-radius:5px ;
-  transition: var(--transition);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform:  translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background-color: #1f1f1f;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  z-index: 99999;
+  
+}
+
+.btn-trailer::before {
+  content: "";
+  position: absolute;
+  left: 32px;
+  top: 22px;
+  width: 0;
+  height: 0;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-left: 26px solid white;
+  cursor: pointer;
 }
 
 .btn-trailer:hover {
-  background-color: var(--button-hover-color);
-  box-shadow: 0 4px 15px var(--sombra) ;
-
-  cursor: pointer;
-  transform: translateY(-3px);
+  opacity: 90%;
 }
 
 h5 {

@@ -447,11 +447,11 @@ async function openModal(details) {
             modalTrailer.innerHTML = `
                 <a href="https://www.youtube.com/embed/${trailerKey}"  
                  title="Trailer de ${details.title}"> 
-                 <button class="btn-trailer"> Assistir trailer </button>
+                 <button class="btn-trailer">  </button>
                 </a> 
             `;
         } else {
-            modalTrailer.innerHTML = `<p style="text-align:center; padding-bottom: 180px">Trailer não disponível.</p>`;
+            modalTrailer.innerHTML = `<p style="text-align:center; color: rgba(255, 208, 11, 0.945); font-weight: bold;"> Trailer não disponível. </p>`;
         }
     }
 }
