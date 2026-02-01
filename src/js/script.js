@@ -451,7 +451,7 @@ async function openModal(details) {
                 </a> 
             `;
         } else {
-            modalTrailer.innerHTML = `<p style="text-align:center; color: rgba(255, 208, 11, 0.945); font-weight: bold;"> Trailer não disponível. </p>`;
+            modalTrailer.innerHTML = `<p style="text-align:center; color: rgba(255, 11, 11, 0.94); font-weight: bold; font-size: 30px;"> Trailer não disponível. </p>`;
         }
     }
 }
