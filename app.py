@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for
-from datetime import timedelta 
+from datetime import timedelta  
+import os
 
 app = Flask(__name__)
 app.secret_key = "chave_secreta"
@@ -11,7 +12,8 @@ senha = "123"
 # Adicionando outro usuário
 usuarios = [
     {"usuario": "admin", "senha": "123"},
-    {"usuario": "daniel", "senha": "456"}
+    {"usuario": "daniel", "senha": "1574"},
+    {"usuario": "juan", "senha": "1574"}
 ]
 
 @app.route('/', methods=['GET', 'POST'])
@@ -45,5 +47,6 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html', usuario=session.get('usuario'))
 
-if __name__ == '__main__':
-    app.run( host="0.0.0.0", port=5000, debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
