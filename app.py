@@ -5,6 +5,7 @@ import os
 app = Flask(__name__)
 app.secret_key = "chave_secreta"
 app.permanent_session_lifetime = timedelta(days=30)
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 usuario = "admin"
 senha = "123"

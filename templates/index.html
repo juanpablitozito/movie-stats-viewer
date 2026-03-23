@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo_stat.ico') }}" type="image/x-icon">
-    <title>Stat Viewer</title>
+    <title>Movie Stats Viewer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,8 @@
             <nav id="home">
 
                 <a href="/src/pages/login.html"><img src="{{ url_for('static', filename='img/logo_stat.ico') }}" alt="logo" ></a>
+
+                <div class="menu-toggle" id="menuToggle"></div>
 
                 <ul>
                  
@@ -192,8 +194,8 @@
     </div>
 
     <footer>
-  <p>© 2025 StatViewer</p>
-  <p>Desenvolvido por <a href="https://portifoliodani.netlify.app"> <strong>Daniel</strong></a> & <a href=""><strong>Juan</strong> </a></p>
+  <p>© 2025 MovieStatsViewer</p>
+  <p>Desenvolvido por <a href="https://portifoliodani.netlify.app"> <strong>Daniel</strong></a> & <a href="https://juanmartins.netlify.app"><strong>Juan</strong> </a></p>
  
    
 
