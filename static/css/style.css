@@ -898,6 +898,7 @@ footer a:hover::after {
 
 /* ===== RESPONSIVO ===== */
 @media (max-width: 767px) {
+
   nav {
     padding: 15px 20px;
     flex-direction: column;
@@ -1012,41 +1013,13 @@ footer a:hover::after {
   }
 }
 
-.menu-toggle {
-  display: none;
-  font-size: 28px;
-  color: var(--off-white);
-  cursor: pointer;
-}
-
 @media (min-width: 768px) and (max-width: 1023px) {
-
-  .menu-toggle {
-    display: block;
-  }
-
-
   nav {
     padding: 0 30px;
   }
 
   ul {
-    position: fixed;
-    top: 90px;
-    left: 0;
-    width: 100%;
-    height: 0;
-    overflow: hidden;
-    flex-direction: column;
-    background: rgba(11, 14, 20, 0.98);
-    transition: 0.4s ease;
     gap: 30px;
-    padding: 0;
-  }
-
-  ul.active {
-    height: 250px;
-    padding: 20px 0;
   }
 
   .input {
