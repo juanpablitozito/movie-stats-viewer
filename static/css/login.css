@@ -1,12 +1,12 @@
 * {
   padding: 0;
   margin: 0;
-
+  box-sizing: border-box;
 }
 
 body {
   
-  background: black !important;
+  background:  #0B0E14 !important;
   overflow-x: hidden;
    overflow-y: hidden;
 }
@@ -37,153 +37,325 @@ body {
 }
 
 .coluna {
-  background-image: url(/assets/img/logo_stat.ico);
-  background-repeat: no-repeat;
-  background-size: 100px  100px;
-  background-position: center;
-  background-attachment:scroll ;
- 
   position: relative;
-  border: 1px solid black;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 10% auto;
+  margin: 8% auto;
   max-width: 500px;
-  padding: 40px;
+  padding: 50px 40px;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.1);
+  z-index: 1;
+  animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.input-campo {
-  background-color: transparent;
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-  border: none;
-  border-bottom: 2px solid grey;
-  width: 100%;
-  padding: 20px;
-  height: 40px;
-  margin-top: 45px;
-  border-radius:4px ;
-  font-size: 18px;
-  color: #fff;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-#deco-texto {
-  text-decoration: none;
-  font-size: 17px;
-  margin-top: 10px;
-  color: #ffffff;
+.logo-decoration {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #D4AF37, #F5D742);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  animation: pulse 2s infinite;
+}
+
+.logo-decoration span {
+  font-size: 40px;
+  font-weight: bold;
+  color: #1a0a0a;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+  }
 }
 
 .text-h2 {
-  color: white;
-  font-size: 30px;
-  margin-bottom: 20px;
+  color: #D4AF37;
+  font-size: 2rem;
+  margin-bottom: 10px;
   text-align: center;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #D4AF37, #F5D742);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-#deco-texto:hover {
-  text-decoration: underline;
-  color: #990808;
-  transition: all 0.3s ease;
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
 }
 
 .login {
   display: flex;
   flex-direction: column;
   width: 100%;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.input-campo {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  width: 100%;
+  padding: 15px 15px 8px 45px;
+  font-size: 16px;
+  color: #fff;
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+.input-campo:focus {
+  outline: none;
+  border-bottom-color: #D4AF37;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+}
+
+.input-campo::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  fill: rgba(212, 175, 55, 0.6);
+  transition: all 0.3s ease;
+}
+
+.input-campo:focus + .input-icon {
+  fill: #D4AF37;
+  transform: translateY(-50%) scale(1.1);
 }
 
 .btn-acesso {
-  border-radius: 20px;
-  background-color: #5F0404;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #8B0000, #5F0404);
   color: white;
-  padding: 10px 0px;
+  padding: 12px 0;
   text-align: center;
   font-size: 16px;
   font-weight: bold;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   border: none;
-  margin-top: 100px;
+  margin-top: 20px;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-acesso::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .btn-acesso:hover {
-  background-color: #7a0a0a;
+  background: linear-gradient(135deg, #a00, #7a0a0a);
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
 }
+
+.btn-acesso:hover::before {
+  left: 100%;
+}
+
+.btn-acesso:active {
+  transform: translateY(0);
+}
+
+   .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1; 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3) 
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
 
 .google-button-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 50px;
 }
 
 .btn-google {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 30px;
+  padding: 12px 126px;
+  font-size: 14px;
+  font-weight: 500;
 
-  color: #5F0404;
-  border: 1px solid #5F0404;
-  border-radius: 20px;
-  padding: 8px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+
 }
 
 .btn-google:hover {
-  background-color: #f5f5f5;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(212, 175, 55, 0.1);
+  border-color: #D4AF37;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
 }
 
 .logo-google {
   width: 20px;
   height: 20px;
-  margin-right: 10px;
 }
 
 .text {
-  padding-top: 80px;
-  font-size: 15px;
-  color: #888888;
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
+#deco-texto {
+  text-decoration: none;
+  color: #D4AF37;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
 
- /*Responsividade */
-  
+#deco-texto::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #D4AF37;
+  transition: width 0.3s ease;
+}
+
+#deco-texto:hover {
+  color: #F5D742;
+}
+
+#deco-texto:hover::after {
+  width: 100%;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+
 @media (max-width: 600px) {
   .coluna {
     width: 90%;
     margin: 20% auto;
-    padding: 20px;
+    padding: 40px 25px;
+  }
+
+  .text-h2 {
+    font-size: 1.8rem;
   }
 
   .input-campo {
-    height: 35px;
-    font-size: 16px;
-    margin-top: 30px;
+    font-size: 14px;
+    padding: 12px 12px 8px 40px;
   }
 
   .btn-acesso {
-    padding: 8px 0px;
+    padding: 12px 0;
     font-size: 14px;
-    margin-top: 80px;
+    margin-top: 15px;
   }
 
   .text {
-    padding-top: 50px;
-    font-size: 13px;
+    font-size: 12px;
   }
 
-body{
-  overflow-y: hidden;
+  .logo-decoration {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+
+  .logo-decoration span {
+    font-size: 30px;
+  }
 }
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .coluna {
+    margin: 15% auto;
+    padding: 45px 35px;
+  }
 }
