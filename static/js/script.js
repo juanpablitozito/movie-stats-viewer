@@ -418,7 +418,7 @@ async function openModal(details) {
     modalOverview.textContent = details.overview || 'Sem sinopse disponível.';
     modalRating.innerHTML = `
         <span style="display: inline-flex; align-items: center;">
-            <img src="/assets/img/logo_stat.ico" style="height: 30px; vertical-align: middle; margin-right: 6px;">
+            <img src="{{ url_for('static', filename='img/estrela.png') }}" style="height: 30px; vertical-align: middle; margin-right: 6px;">
             ${details.vote_average?.toFixed(1) || 'N/A'}/10
         </span>
     `;
@@ -554,6 +554,44 @@ function configurarEventosBotoes() {
     });
 }
 
+// === EFEITO DE SCROLL NA NAVBAR ===
+
+/**
+ * Adiciona efeito de fundo na navbar ao fazer scroll
+ */
+function configurarEfeitoScrollNavbar() {
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('nav');
+        if (!nav) return;
+        
+        if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    });
+}
+
+// === SMOOTH SCROLL PARA ÂNCORAS ===
+
+/**
+ * Configura smooth scroll para links de âncora (#)
+ */
+function configurarSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
 // === ALERTA DE BOAS-VINDAS ===
 
 /**
@@ -591,12 +629,14 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarTodosOsFilmes();
     
     // Configura funcionalidades adicionais
-    configurarSwipe();       // Swipe para mobile
-    configurarEventosBotoes(); // Botões de navegação
-    configurarBusca();       // Sistema de busca
+    configurarSwipe();                 // Swipe para mobile
+    configurarEventosBotoes();         // Botões de navegação
+    configurarBusca();                 // Sistema de busca
+    configurarEfeitoScrollNavbar();    // Efeito de scroll na navbar
+    configurarSmoothScroll();          // Smooth scroll para âncoras
     
     // Exibe alerta de boas-vindas após um delay
-    setTimeout(mostrarAlerta, 1000);
+    // setTimeout(mostrarAlerta, 1000);
 });
 
 // Configura botões de navegação do carrossel principal (se existirem)
