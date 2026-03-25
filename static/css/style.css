@@ -728,6 +728,44 @@ hr {
   margin: 30px 0;
 }
 
+#robotNotifications {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10000;
+}
+
+.robot-msg {
+  background: rgba(11, 14, 20, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 280px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  font-size: 0.9rem;
+  animation: slideIn 0.4s ease;
+  backdrop-filter: blur(10px);
+}
+
+.robot-msg strong {
+  color: var(--metallic-gold);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* ===== SEARCH OVERLAY ===== */
 .search-overlay {
   position: fixed;

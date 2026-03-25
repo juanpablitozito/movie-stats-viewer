@@ -14,9 +14,9 @@ let carrosselInterval; // Intervalo para transição automática
  * @returns {boolean} True se for dispositivo móvel
  */
 function isMobileDevice() {
-    return (typeof window.orientation !== "undefined") || 
-           (navigator.userAgent.indexOf('IEMobile') !== -1) ||
-           (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    return (typeof window.orientation !== "undefined") ||
+        (navigator.userAgent.indexOf('IEMobile') !== -1) ||
+        (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 }
 
 // === CONFIGURAÇÃO SWIPE PARA MOBILE ===
@@ -25,7 +25,7 @@ function isMobileDevice() {
  */
 function configurarSwipe() {
     const carrossel = document.querySelector('.carrossel');
-    
+
     // Verifica se o carrossel existe e se é dispositivo móvel
     if (!carrossel || !isMobileDevice()) return;
 
@@ -71,7 +71,7 @@ async function carregarCarrossel() {
         const filmes = dados.results.slice(0, 5); // Pega os 5 primeiros filmes
 
         const slidesContainer = document.getElementById('slides');
-        
+
         // Verifica se o container existe
         if (!slidesContainer) {
             console.error("Elemento 'slides' não encontrado");
@@ -80,10 +80,10 @@ async function carregarCarrossel() {
 
         // Gera o HTML para cada slide do carrossel
         slidesContainer.innerHTML = filmes.map(filme => {
-            const backdropUrl = filme.backdrop_path 
+            const backdropUrl = filme.backdrop_path
                 ? `https://image.tmdb.org/t/p/w1280${filme.backdrop_path}`
                 : 'https://via.placeholder.com/1280x500/333/666?text=Imagem+Indisponível';
-            
+
             return `
             <div class="slide" style="min-width:100%; height: 500px; 
                  background-image: url('${backdropUrl}');
@@ -111,7 +111,7 @@ async function carregarCarrossel() {
 function configurarIntervaloMobile() {
     // Limpa intervalo existente
     if (carrosselInterval) clearInterval(carrosselInterval);
-    
+
     // Define intervalo baseado no dispositivo
     const intervalo = isMobileDevice() ? 5000 : 8000;
     carrosselInterval = setInterval(avancarSlide, intervalo);
@@ -159,7 +159,7 @@ function avancarFilmes(type) {
         console.warn(`Elemento com ID '${type}' não encontrado`);
         return;
     }
-    
+
     // Define quantidade de rolagem baseada no dispositivo
     const scrollAmount = isMobileDevice() ? 200 : 400;
     movieRow.scrollBy({
@@ -178,7 +178,7 @@ function voltarFilmes(type) {
         console.warn(`Elemento com ID '${type}' não encontrado`);
         return;
     }
-    
+
     // Define quantidade de rolagem baseada no dispositivo
     const scrollAmount = isMobileDevice() ? 200 : 400;
     movieRow.scrollBy({
@@ -233,7 +233,7 @@ function configurarBusca() {
             .then(response => response.json())
             .then(data => {
                 resultsContainer.innerHTML = ''; // Limpa resultados anteriores
-                
+
                 if (data.results && data.results.length > 0) {
                     // Cria um card para cada filme encontrado
                     data.results.forEach(movie => {
@@ -247,7 +247,7 @@ function configurarBusca() {
                             <img src="${poster}" alt="${movie.title}" />
                             <p>${movie.title}</p>
                         `;
-                        
+
                         // Abre modal com detalhes ao clicar no card
                         card.addEventListener('click', () => {
                             hideOverlay();
@@ -315,7 +315,7 @@ function fetchMovies(type) {
     let url = '';
 
     // Define a URL da API baseada no tipo de categoria
-    switch(type) {
+    switch (type) {
         case 'launches':
             url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=pt-BR&page=1`;
             break;
@@ -360,10 +360,10 @@ function fetchMovies(type) {
                     const card = document.createElement('div');
                     card.classList.add('card-movie');
 
-                    const posterUrl = filme.poster_path 
-                        ? imgBase + filme.poster_path 
+                    const posterUrl = filme.poster_path
+                        ? imgBase + filme.poster_path
                         : 'https://via.placeholder.com/150x225?text=Sem+Imagem';
-                    
+
                     card.innerHTML = `
                         <img src="${posterUrl}" alt="${filme.title}" loading="lazy"/>
                     `;
@@ -392,6 +392,49 @@ function fetchMovies(type) {
         });
 }
 
+function mostrarNotificacoes(details) {
+    const container = document.getElementById('robotNotifications');
+    container.innerHTML = '';
+
+    const nota = details.vote_average;
+
+    let mensagens = [];
+
+    if (nota >= 7) {
+        mensagens = [
+            "🤖 O público tá curtindo bastante esse filme!",
+            "🔥 Destaque pra atuação e história.",
+            "⭐ Avaliação alta — vale a pena assistir!"
+        ];
+    } else if (nota >= 5) {
+        mensagens = [
+            "🤖 Opiniões divididas sobre esse filme...",
+            "😐 Alguns gostaram, outros nem tanto.",
+            "🎬 Talvez dependa do seu gosto."
+        ];
+    } else {
+        mensagens = [
+            "🤖 Esse aqui não agradou muito...",
+            "💬 Muitas críticas negativas.",
+            "⚠️ Talvez não seja uma boa escolha."
+        ];
+    }
+
+    mensagens.forEach((msg, index) => {
+        setTimeout(() => {
+            const div = document.createElement('div');
+            div.classList.add('robot-msg');
+            div.innerHTML = `<strong>Robô:</strong> ${msg}`;
+            container.appendChild(div);
+
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+
+        }, index * 1500);
+    });
+}
+
 // === SISTEMA DE MODAL ===
 
 // Elementos do modal
@@ -418,12 +461,12 @@ async function openModal(details) {
     modalOverview.textContent = details.overview || 'Sem sinopse disponível.';
     modalRating.innerHTML = `
         <span style="display: inline-flex; align-items: center;">
-            <img src="{{ url_for('static', filename='img/estrela.png') }}" style="height: 30px; vertical-align: middle; margin-right: 6px;">
-            ${details.vote_average?.toFixed(1) || 'N/A'}/10
-        </span>
+        <img src="/static/img/logo_stat.ico" style="height: 30px; vertical-align: middle; margin-right: 6px;">
+        ${details.vote_average?.toFixed(1) || 'N/A'}/10
+    </span>
     `;
     modalRelease.textContent = `${details.release_date || 'Desconhecido'}`;
-    
+
     // Exibe o modal
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden'; // Impede scroll da página
@@ -437,6 +480,8 @@ async function openModal(details) {
     } else {
         modalBgImage.style.backgroundImage = 'none';
     }
+
+    mostrarNotificacoes(details);
 
     // Busca e exibe o trailer
     const trailerKey = await buscarTrailer(details.id);
@@ -508,10 +553,10 @@ if (modal) {
  */
 function carregarTodosOsFilmes() {
     const categorias = [
-        'launches', 'topRated', 'popular', 'acao', 
+        'launches', 'topRated', 'popular', 'acao',
         'comedia', 'terror', 'suspense', 'romance', 'anime'
     ];
-    
+
     categorias.forEach(categoria => {
         fetchMovies(categoria);
     });
@@ -523,9 +568,9 @@ function carregarTodosOsFilmes() {
  * Configura os event listeners para os botões de navegação das seções
  */
 function configurarEventosBotoes() {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const classList = e.target.classList;
-        
+
         // Navegação para a seção de lançamentos
         if (classList.contains('prev-launches') || e.target.closest('.prev-launches')) {
             voltarFilmes('launches');
@@ -533,7 +578,7 @@ function configurarEventosBotoes() {
         if (classList.contains('next-launches') || e.target.closest('.next-launches')) {
             avancarFilmes('launches');
         }
-        
+
         // Navegação para a seção de populares
         if (classList.contains('prev-popular') || e.target.closest('.prev-popular')) {
             voltarFilmes('popular');
@@ -541,7 +586,7 @@ function configurarEventosBotoes() {
         if (classList.contains('next-popular') || e.target.closest('.next-popular')) {
             avancarFilmes('popular');
         }
-        
+
         // Navegação para a seção de melhores avaliados
         if (classList.contains('prev-topRated') || e.target.closest('.prev-topRated')) {
             voltarFilmes('topRated');
@@ -549,7 +594,7 @@ function configurarEventosBotoes() {
         if (classList.contains('next-topRated') || e.target.closest('.next-topRated')) {
             avancarFilmes('topRated');
         }
-        
+
         // Adicione outros botões conforme necessário para outras seções
     });
 }
@@ -563,7 +608,7 @@ function configurarEfeitoScrollNavbar() {
     window.addEventListener('scroll', () => {
         const nav = document.querySelector('nav');
         if (!nav) return;
-        
+
         if (window.scrollY > 50) {
             nav.classList.add('scrolled');
         } else {
@@ -621,29 +666,29 @@ function exibirAlerta() {
 /**
  * Função principal que inicializa toda a aplicação
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Inicializando aplicação...');
-    
+
     // Carrega o carrossel principal e todas as seções de filmes
     carregarCarrossel();
     carregarTodosOsFilmes();
-    
+
     // Configura funcionalidades adicionais
     configurarSwipe();                 // Swipe para mobile
     configurarEventosBotoes();         // Botões de navegação
     configurarBusca();                 // Sistema de busca
     configurarEfeitoScrollNavbar();    // Efeito de scroll na navbar
     configurarSmoothScroll();          // Smooth scroll para âncoras
-    
+
     // Exibe alerta de boas-vindas após um delay
     // setTimeout(mostrarAlerta, 1000);
 });
 
 // Configura botões de navegação do carrossel principal (se existirem)
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const prevBtn = document.querySelector('.carousel-prev');
     const nextBtn = document.querySelector('.carousel-next');
-    
+
     if (prevBtn) prevBtn.addEventListener('click', voltarSlide);
     if (nextBtn) nextBtn.addEventListener('click', avancarSlide);
 });
