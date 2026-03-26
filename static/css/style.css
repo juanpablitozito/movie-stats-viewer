@@ -881,6 +881,31 @@ footer a:hover::after {
   width: 100%;
 }
 
+/* ===== BUTTON CHATBOT ===== */
+.chatbot-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: var(--rich-black);
+  color: var(--metallic-gold);
+  padding: 12px 20px;
+  border: var(--elegant-border);
+  border-radius: 30px;
+  font-weight: 600;
+  z-index: 10000;
+  text-decoration: none;
+  box-shadow: var(--cinema-shadow);
+  transition: var(--cinema-transition);
+}
+
+.chatbot-button:hover {
+  background: var(--metallic-gold);
+  color: var(--deep-navy);
+  border-color: var(--metallic-gold);
+  box-shadow: 0 0 30px var(--metallic-gold);
+  transform: scale(1.1);
+}
+
 /* ===== ANIMAÇÕES ===== */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
