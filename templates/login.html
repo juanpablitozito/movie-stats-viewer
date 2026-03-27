@@ -20,13 +20,23 @@
   <div class="stars"></div>
 
   <div class="coluna">
-    <h2 class="text-h2">Entrar:</h2>
+    <h2 class="text-h2">Stat Viewer</h2> 
+    <p class="subtitle">Sua experiência cinematográfica começa aqui</p>
 
     <form class="login" method="POST" action="{{ url_for('login') }}">
-      <input class="input-campo" type="text" name="usuario" placeholder="Digite seu usuário" required>
-      <input class="input-campo" type="password" name="senha" placeholder="Digite sua senha" required>
-
-      <a href="#" id="deco-texto">Esqueceu sua senha?</a>
+     <div class="input-group">
+                <input type="text" id="usuario" name="usuario" class="input-campo" placeholder="Usuário" required>
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                 </g></svg>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="password" name="senha" class="input-campo" placeholder="Senha" required>
+                <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+            </div>
+      <a href="#" id="deco-texto" style="width: 38%;">Esqueceu sua senha?</a>
 
       <button id="Acessar" type="submit" class="btn-acesso" onclick="acessar()">
         Acessar
@@ -36,10 +46,10 @@
     {% if mensagem %}
       <p>{{ mensagem }}</p>
     {% endif %}
-
+    <div class="divider"> ou </div>
     <div class="google-button-container">
       <button class="btn-google" type="button">
-        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" class="logo-google">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"  alt="Google Logo" class="logo-google">
         Entrar com o Google
       </button>
     </div>
@@ -54,7 +64,6 @@
     let buttonAcessar = document.getElementById('Acessar');
 
     function acessar() {
-      alert('Acessar clicado!');
       window.location.href = "{{ url_for('index') }}";
       
     }
