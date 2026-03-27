@@ -882,28 +882,102 @@ footer a:hover::after {
 }
 
 /* ===== BUTTON CHATBOT ===== */
-.chatbot-button {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background: var(--rich-black);
-  color: var(--metallic-gold);
-  padding: 12px 20px;
-  border: var(--elegant-border);
-  border-radius: 30px;
-  font-weight: 600;
-  z-index: 10000;
-  text-decoration: none;
-  box-shadow: var(--cinema-shadow);
-  transition: var(--cinema-transition);
+
+#openChat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 70px;
+    height: 70px;
+    background: var(--metallic-gold);
+    border: 2px solid var(--elegant-border);
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+    transition: var(--cinema-transition);
+    z-index: 10000;
+    backdrop-filter: blur(5px);
 }
 
-.chatbot-button:hover {
-  background: var(--metallic-gold);
-  color: var(--deep-navy);
-  border-color: var(--metallic-gold);
-  box-shadow: 0 0 30px var(--metallic-gold);
-  transform: scale(1.1);
+#openChat:hover {
+    transform: scale(1.2);
+    background: var(--rich-black);
+    box-shadow: 0 0 50px var(--metallic-gold);
+}
+
+#openChat img {
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 0 10px var(--glow-effect));
+    transition: var(--elegant-transition);
+}
+
+#chatOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 999;
+}
+
+/* Caixa do chat  */
+#chatBox {
+    width: 600px;
+    height: 500px;
+    background: #1e1e1e;
+    border-radius: 12px;
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+@keyframes fadeIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Header */
+#chatHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #2a2a2a;
+    color: white;
+}
+
+/* Área de mensagens */
+#chatMessages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    color: white;
+}
+
+/* Input */
+#chatInputArea {
+    display: flex;
+    padding: 10px;
+    background: #2a2a2a;
+}
+
+#chatInput {
+    flex: 1;
+    padding: 8px;
 }
 
 /* ===== ANIMAÇÕES ===== */

@@ -692,3 +692,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (prevBtn) prevBtn.addEventListener('click', voltarSlide);
     if (nextBtn) nextBtn.addEventListener('click', avancarSlide);
 });
+
+
+// Botão para abrir o chatbot
+
+const overlay = document.getElementById("chatOverlay");
+
+document.getElementById("openChat").onclick = () => {
+    overlay.style.display = "flex";
+};
+
+function fecharChat() {
+    overlay.style.display = "none";
+}
