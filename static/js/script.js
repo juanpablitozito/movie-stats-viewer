@@ -533,6 +533,7 @@ async function openModal(details) {
             modalTrailer.innerHTML = `
                 <a href="https://www.youtube.com/embed/${trailerKey}" title="Trailer de ${details.title}" target="_blank">
                     <button class="btn-trailer"></button>
+                    
                 </a>
             `;
         } else {
