@@ -505,7 +505,7 @@ async function openModal(details) {
     modalOverview.textContent = details.overview || "Sem sinopse disponível.";
     modalRating.innerHTML = `
         <span style="display: inline-flex; align-items: center;">
-            <img src="/static/img/logo_stat.ico" style="height: 30px; vertical-align: middle; margin-right: 6px;">
+            <img src="/stat-viewer/static/img/logo_stat.ico" style="height: 30px; vertical-align: middle; margin-right: 6px;">
             ${details.vote_average?.toFixed(1) || "N/A"}/10
         </span>
     `;
