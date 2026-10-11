@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="./static/img/logo_stat.ico" type="image/x-icon">
+  <link rel="icon" href="/static/img/favicon-stat.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-stat-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-stat-16.png">
   <title>Movie Stats Viewer</title>
   <link rel="stylesheet" href="./static/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,25 +14,27 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
+  <a class="skip-link" href="#catalogo">Pular para o catálogo</a>
 
   <header>
     <section class="nav-bar">
 
-      <nav id="home">
+      <nav id="home" aria-label="Navegação principal">
 
-        <a href="/stat-viewer/src/pages/login.html"><img src="./static/img/logo_stat.ico" alt="logo"></a>
+        <a href="/index" class="brand"><img class="brand-logo" src="/static/img/logo_stat-matte.png" alt="Logo do Stat: claquete de cinema" width="44" height="44"><span>Movie Stats<small>VIEWER</small></span></a>
 
 
         <ul>
 
-          <li><a href="#home">Home</a></li>
+          <li><a href="#home" class="active">Explorar</a></li>
+
           <li><a href="#lançamentos">Lançamentos</a></li>
           <li><a href="#populares">Populares</a></li>
-          <li><a href="#melhoravaliados">Melhor Avaliados</a></li>
+          <li><a href="#melhoravaliados">Bem avaliados</a></li>
         </ul>
 
         <div class="search-container">
@@ -42,23 +46,25 @@
                 </path>
               </g>
             </svg>
-            <input id="query" class="input" type="search" placeholder="Buscar Filmes..." name="searchbar" />
+            <input id="query" class="input" type="search" placeholder="Buscar Filmes..." name="searchbar" aria-label="Buscar filmes" autocomplete="off" />
           </div>
         </div>
 
+        <a class="logout-link" href="/logout">Sair <span aria-hidden="true">↗</span></a>
         <!-- Overlay para resultados da busca -->
         <div id="searchResultsOverlay" class="search-overlay hidden">
-          <div id="searchResults" class="search-results"></div>
+          <div class="search-heading"><h2>Resultados da busca</h2><button id="closeSearch" type="button" aria-label="Fechar busca">×</button></div>
+          <div id="searchResults" class="search-results" aria-live="polite"></div>
         </div>
       </nav>
 
     </section>
 
   </header>
-  <main>
+  <main id="catalogo">
 
     <section>
-      <div class="carrossel">
+      <div class="carrossel" aria-label="Filmes em destaque" aria-roledescription="carrossel">
         <div class="slides" id="slides">
 
         </div>
@@ -68,6 +74,7 @@
       </div>
     </section>
 
+    <div class="catalog-intro"><div><p class="eyebrow">SEU PRÓXIMO PLAY</p><h1>Encontre uma boa história.</h1></div><p>Lançamentos, favoritos do público e descobertas para todos os gostos.</p></div>
     <section id="lançamentos">
       <h2>Lançamentos</h2>
       <div class="movie-section">
@@ -155,7 +162,7 @@
 
 
   <!-- Caixa de avaliaçao -->
-  <div id="movieModal" class="modal hidden">
+  <div id="movieModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-container">
       <div class="modal-image" id="modalBgImage">
         <div id="modalTrailer">
@@ -163,7 +170,7 @@
         </div>
       </div>
       <div class="modal-content">
-        <span id="closeModal" class="close-button">&times;</span>
+        <button id="closeModal" class="close-button" aria-label="Fechar detalhes">&times;</button>
 
         <div class="modal-header">
           <h2 id="modalTitle"></h2>
@@ -189,41 +196,41 @@
     </div>
   </div>
 
-  <div id="robotNotifications"></div>
+  <div id="robotNotifications" aria-live="polite"></div>
+  <button id="openChat" type="button">Conversar com Viewy</button>
 
 
   <!-- <button id="openChat"><img src="./stat-viewer/static/img/logo_stat.ico" alt="logo"></button> -->
 
   <div id="chatOverlay" style="display: none;">
-    <div id="chatBox">
+    <div id="chatBox" role="dialog" aria-modal="true" aria-labelledby="chatHeader">
         <div id="chatHeader">
             <span>Viewy - Assistente Virtual</span>
-            <button onclick="fecharChat()">✖</button>
+            <button onclick="fecharChat()" aria-label="Fechar assistente">✖</button>
         </div>
 
-        <div id="chatMessages"></div>
+        <div id="chatMessages" role="log" aria-live="polite"></div>
 
         <div id="chatInputArea">
-            <input type="text" id="chatInput" placeholder="Pergunte alguma coisa...">
+            <input type="text" id="chatInput" aria-label="Mensagem para o assistente" maxlength="2000" placeholder="Pergunte alguma coisa...">
             <button onclick="sendMessage()">Enviar</button>
         </div>
     </div>
 </div>
 
   <footer>
-    <p>© 2025 MovieStatsViewer</p>
+    <p>Movie Stats Viewer · Feito para quem ama cinema</p>
     <p>Desenvolvido por <a href="https://portifoliodani.netlify.app"> <strong>Daniel</strong></a> & <a
         href="https://juanmartins.netlify.app"><strong>Juan</strong> </a></p>
 
 
 
-    </div>
   </footer>
 
 
 
   <script>
-    window.usuario = "{{ usuario }}";
+    window.usuario = {{ usuario | tojson }};
   </script>
   <script src="./static/js/script.js"></script>
 </body>

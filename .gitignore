@@ -1,4 +1,6 @@
-/.history
-/templates/test.html
-/venv/  
-/templates/test.html
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.history/

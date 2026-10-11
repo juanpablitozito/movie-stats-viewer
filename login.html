@@ -1,73 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="/stat-viewer/static/css/login.css">
-  <link rel="shortcut icon" href="/stat-viewer/static/img/logo_stat.ico" type="image/x-icon">
-
+  <meta name="theme-color" content="#101113">
+  <title>Entrar · Movie Stats Viewer</title>
+  <link rel="icon" href="/static/img/favicon-stat.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-stat-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-stat-16.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <title>Login - Movie Stats Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/login.css">
 </head>
-
 <body>
-  <div class="stars"></div>
-
-  <div class="coluna">
-    <h2 class="text-h2">Movie Stats Viewer</h2> 
-    <p class="subtitle">Sua experiência cinematográfica começa aqui</p>
-
-    <form class="login" method="POST" action="/login">
-     <div class="campo-input">
-                <input type="text" id="usuario" name="usuario" class="input-campo" placeholder="Usuário" required>
-            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                 </g></svg>
-            </div>
-            
-            <div class="campo-input">
-                <input type="password" id="password" name="senha" class="input-campo" placeholder="Senha" required>
-                <svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                </svg>
-            </div>
-      <a href="#" id="deco-texto">Esqueceu sua senha?</a>
-
-      <button id="Acessar" type="submit" class="btn-acesso" onclick="acessar()">
-        Acessar
-      </button>
-    </form>
-
-    <div class="divider"> ou </div>
-    <div class="google-button-container">
-      <button class="btn-google" type="button">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"  alt="Google Logo" class="logo-google">
-        Entrar com o Google
-      </button>
-    </div>
-
-    <h4 class="text">Ainda não possui uma conta?
-      <a href="#" id="deco-texto">Cadastre-se</a>
-    </h4>
-  </div>
-
-  <script>
-
-    let buttonAcessar = document.getElementById('Acessar');
-
-    function acessar() {
-      window.location.href = "/stat-viewer/src/pages/index.html";
-    }
-
-    document.querySelector('.btn-google').addEventListener('click', function () {
-      alert('Login com Google clicado!');
-    });
-  </script>
+  <div class="stars" aria-hidden="true"></div>
+  <main class="login-layout">
+    <section class="form-panel" aria-labelledby="login-title">
+      <div class="form-card">
+        <img class="login-logo" src="/static/img/logo_stat-matte.png" alt="Logo do Stat: claquete de cinema" width="96" height="96">
+        <span class="form-kicker">BEM-VINDO AO STAT</span>
+        <h2 id="login-title">Movie Stats Viewer</h2>
+        <p class="form-description">Sua experiência cinematográfica começa aqui.</p>
+        {% if mensagem %}<div role="alert" class="login-error">{{ mensagem }}</div>{% endif %}
+        <form class="login" method="POST" action="/login">
+          <div class="field"><label for="usuario">Usuário</label><input id="usuario" name="usuario" type="text" placeholder="Digite seu usuário" autocomplete="username" value="{{ request.form.get('usuario', '') }}" required></div>
+          <div class="field"><label for="password">Senha</label><div class="password-field"><input id="password" name="senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" required><button id="togglePassword" type="button" aria-controls="password" aria-pressed="false">Mostrar</button></div></div>
+          <p id="capsWarning" class="caps-warning" hidden>Caps Lock está ativado.</p>
+          <button class="btn-acesso" type="submit">Entrar na minha conta <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="form-note">Prepare a pipoca. A gente cuida da descoberta.</p>
+      </div>
+      <p class="login-credit">MOVIE STATS VIEWER <span>Feito por Daniel & Juan</span></p>
+    </section>
+  </main>
+  <script src="/static/js/login.js"></script>
 </body>
-
 </html>

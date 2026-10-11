@@ -1,12 +1,12 @@
 // === VARIÁVEIS GLOBAIS ===
-const baseUrl = "https://api.themoviedb.org/3";
-const apiKey = "667f29be2c2b3a1826a0467ad42f291b";
+const baseUrl = "/api/tmdb";
 const imgBase = "https://image.tmdb.org/t/p/w500";
 
 let indice = 0;
 let total = 0;
 let carrosselInterval;
 let filmeAtual = null;
+let modalTrigger = null;
 
 // === ELEMENTOS DO MODAL ===
 const modal = document.getElementById("movieModal");
@@ -52,8 +52,8 @@ function configurarSwipe() {
 // === CARROSSEL PRINCIPAL ===
 async function carregarCarrossel() {
     try {
-        const resposta = await fetch(`${baseUrl}/movie/now_playing?api_key=${apiKey}&language=pt-BR&page=1`);
-        const dados = await resposta.json();
+        const resposta = await fetchJSON(`${baseUrl}/movie/now_playing?language=pt-BR&page=1`);
+        const dados = resposta;
         const filmes = dados.results.slice(0, 5);
 
         const slidesContainer = document.getElementById("slides");
@@ -62,28 +62,32 @@ async function carregarCarrossel() {
             return;
         }
 
-        slidesContainer.innerHTML = filmes.map(filme => {
-            const backdropUrl = filme.backdrop_path
-                ? `https://image.tmdb.org/t/p/w1280${filme.backdrop_path}`
-                : "https://via.placeholder.com/1280x500/333/666?text=Imagem+Indisponível";
-
-            return `
-                <div class="slide" style="
-                    min-width: 100%;
-                    height: 500px;
-                    background-image: url('${backdropUrl}');
-                    background-size: cover;
-                    background-position: center;
-                "></div>
-            `;
-        }).join("");
+        if (!filmes.length) throw new Error("Nenhum destaque disponível");
+        slidesContainer.replaceChildren(filmes.map(filme => {
+            const slide = document.createElement("div");
+            slide.className = "slide";
+            slide.setAttribute("role", "group");
+            slide.setAttribute("aria-label", filme.title);
+            if (filme.backdrop_path) slide.style.backgroundImage = `url("https://image.tmdb.org/t/p/w1280${filme.backdrop_path}")`;
+            slide.innerHTML = `
+                <div class="hero-copy">
+                    <p class="eyebrow">EM CARTAZ · EM DESTAQUE</p>
+                    <h2>${escapeHTML(filme.title)}</h2>
+                    <div class="hero-meta"><span>★ ${formatRating(filme)}</span><span>${escapeHTML(filme.release_date?.slice(0, 4) || "Ano não informado")}</span></div>
+                    <p class="hero-overview">${escapeHTML(filme.overview || "Uma nova história para descobrir. Confira os detalhes deste filme.")}</p>
+                    <button class="hero-detail" type="button">Conhecer o filme ↗</button>
+                </div>`;
+            slide.querySelector("button").addEventListener("click", () => showMovie(filme.id));
+            return slide;
+        }).reduce((container, slide) => { container.appendChild(slide); return container; }, document.createDocumentFragment()));
 
         total = filmes.length;
         indice = 0;
         atualizarSlide();
-        configurarIntervaloMobile();
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) configurarIntervaloMobile();
     } catch (error) {
-        console.error("Erro ao carregar carrossel principal:", error);
+        document.getElementById("slides").innerHTML = '<div class="hero-error"><p class="eyebrow">MOVIE STATS VIEWER</p><h2>Sua próxima história começa aqui.</h2><p>Não foi possível carregar os destaques. Tente novamente em instantes.</p><button class="hero-detail" type="button">Tentar novamente</button></div>';
+        document.querySelector(".hero-error button").addEventListener("click", carregarCarrossel);
     }
 }
 
@@ -97,7 +101,11 @@ function atualizarSlide() {
     const slides = document.getElementById("slides");
     if (slides) {
         slides.style.transform = `translateX(-${indice * 100}%)`;
-        slides.style.transition = "transform 0.8s ease-in-out";
+        slides.style.transition = "transform 0.6s ease-in-out";
+        slides.querySelectorAll(".slide").forEach((slide, index) => {
+            slide.inert = index !== indice;
+            slide.setAttribute("aria-hidden", String(index !== indice));
+        });
     }
 }
 
@@ -155,37 +163,30 @@ function configurarBusca() {
         overlay.classList.add("hidden");
     }
 
+    let searchVersion = 0;
+    let searchTimer;
+    document.getElementById("closeSearch").addEventListener("click", () => {
+        ++searchVersion;
+        clearTimeout(searchTimer);
+        hideOverlay();
+    });
     function searchMovies(query) {
+        const version = ++searchVersion;
         if (!query.trim()) {
             hideOverlay();
             return;
         }
 
-        fetch(`${baseUrl}/search/movie?api_key=${apiKey}&language=pt-BR&query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
+        fetchJSON(`${baseUrl}/search/movie?language=pt-BR&query=${encodeURIComponent(query)}`)
+
             .then(data => {
+                if (version !== searchVersion) return;
                 resultsContainer.innerHTML = "";
 
                 if (data.results && data.results.length > 0) {
                     data.results.forEach(movie => {
-                        const poster = movie.poster_path
-                            ? `${imgBase}${movie.poster_path}`
-                            : "https://via.placeholder.com/150x225?text=Sem+Imagem";
-
-                        const card = document.createElement("div");
-                        card.classList.add("card-movie");
-                        card.innerHTML = `
-                            <img src="${poster}" alt="${movie.title}" />
-                            <p>${movie.title}</p>
-                        `;
-
-                        card.addEventListener("click", () => {
-                            hideOverlay();
-                            fetch(`${baseUrl}/movie/${movie.id}?api_key=${apiKey}&language=pt-BR`)
-                                .then(response => response.json())
-                                .then(details => openModal(details))
-                                .catch(error => console.error("Erro ao buscar detalhes do filme da busca:", error));
-                        });
+                        const card = createMovieCard(movie);
+                        card.addEventListener("click", hideOverlay);
 
                         resultsContainer.appendChild(card);
                     });
@@ -197,17 +198,23 @@ function configurarBusca() {
                 }
             })
             .catch(err => {
-                console.error("Erro na busca:", err);
+                if (version !== searchVersion) return;
+                resultsContainer.textContent = "Não foi possível buscar. Tente novamente.";
+                showOverlay();
             });
     }
 
     searchInput.addEventListener("input", (e) => {
-        searchMovies(e.target.value);
+        ++searchVersion;
+        clearTimeout(searchTimer);
+        if (!e.target.value.trim()) { hideOverlay(); return; }
+        searchTimer = setTimeout(() => searchMovies(e.target.value), 300);
     });
 
     searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
+            clearTimeout(searchTimer);
             searchMovies(searchInput.value);
         }
     });
@@ -233,59 +240,45 @@ function fetchMovies(type) {
 
     switch (type) {
         case "launches":
-            url = `${baseUrl}/movie/now_playing?api_key=${apiKey}&language=pt-BR&page=1`;
+            url = `${baseUrl}/movie/now_playing?language=pt-BR&page=1`;
             break;
         case "topRated":
-            url = `${baseUrl}/movie/top_rated?api_key=${apiKey}&language=pt-BR&page=1`;
+            url = `${baseUrl}/movie/top_rated?language=pt-BR&page=1`;
             break;
         case "popular":
-            url = `${baseUrl}/movie/popular?api_key=${apiKey}&language=pt-BR&page=1`;
+            url = `${baseUrl}/movie/popular?language=pt-BR&page=1`;
             break;
         case "acao":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=28&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=28&page=1`;
             break;
         case "comedia":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=35&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=35&page=1`;
             break;
         case "terror":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=27&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=27&page=1`;
             break;
         case "suspense":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=53&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=53&page=1`;
             break;
         case "romance":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=10749&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=10749&page=1`;
             break;
         case "anime":
-            url = `${baseUrl}/discover/movie?api_key=${apiKey}&language=pt-BR&with_genres=16&with_original_language=ja&page=1`;
+            url = `${baseUrl}/discover/movie?language=pt-BR&with_genres=16&with_original_language=ja&page=1`;
             break;
         default:
             console.error("Tipo de filme não reconhecido:", type);
             return;
     }
 
-    fetch(url)
-        .then(response => response.json())
+    fetchJSON(url)
+
         .then(data => {
             row.innerHTML = "";
 
             if (data.results && data.results.length > 0) {
                 data.results.forEach(filme => {
-                    const card = document.createElement("div");
-                    card.classList.add("card-movie");
-
-                    const posterUrl = filme.poster_path
-                        ? imgBase + filme.poster_path
-                        : "https://via.placeholder.com/150x225?text=Sem+Imagem";
-
-                    card.innerHTML = `<img src="${posterUrl}" alt="${filme.title}" loading="lazy"/>`;
-
-                    card.addEventListener("click", () => {
-                        fetch(`${baseUrl}/movie/${filme.id}?api_key=${apiKey}&language=pt-BR`)
-                            .then(response => response.json())
-                            .then(details => openModal(details))
-                            .catch(error => console.error("Erro ao buscar detalhes do filme:", error));
-                    });
+                    const card = createMovieCard(filme);
 
                     row.appendChild(card);
                 });
@@ -353,11 +346,11 @@ function mostrarNotificacoes(details) {
 
 // === TRAILER ===
 async function buscarTrailer(movieId) {
-    const url = `${baseUrl}/movie/${movieId}/videos?api_key=${apiKey}&language=pt-BR`;
+    const url = `${baseUrl}/movie/${movieId}/videos?language=pt-BR`;
 
     try {
-        const resposta = await fetch(url);
-        const dados = await resposta.json();
+        const resposta = await fetchJSON(url);
+        const dados = resposta;
 
         const trailer = dados.results.find(video =>
             video.site === "YouTube" && video.type === "Trailer"
@@ -377,15 +370,14 @@ async function openModal(details) {
         return;
     }
 
+    modalTrigger = document.activeElement;
     modalTitle.textContent = details.title;
     modalOverview.textContent = details.overview || "Sem sinopse disponível.";
-    modalRating.innerHTML = `
-        <span style="display: inline-flex; align-items: center;">
-            <img src="/stat-viewer/static/img/logo_stat.ico" style="height: 30px; vertical-align: middle; margin-right: 6px;">
-            ${details.vote_average?.toFixed(1) || "N/A"}/10
-        </span>
-    `;
-    modalRelease.textContent = details.release_date || "Desconhecido";
+    modalRating.textContent = `★ ${formatRating(details)}`;
+    const release = details.release_date;
+    modalRelease.textContent = release && /^\d{4}-\d{2}-\d{2}$/.test(release)
+        ? `Lançamento: ${new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(release))}`
+        : "Data de lançamento não informada";
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -399,17 +391,20 @@ async function openModal(details) {
             : "none";
     }
 
-    mostrarNotificacoes(details);
+    filmeAtual = details.id;
+    closeModalBtn.focus();
+    document.getElementById("modalTrailer").textContent = "Buscando trailer…";
 
     const trailerKey = await buscarTrailer(details.id);
+    if (filmeAtual !== details.id || modal.classList.contains("hidden")) return;
     const modalTrailer = document.getElementById("modalTrailer");
 
     if (modalTrailer) {
-        if (trailerKey) {
+        if (trailerKey && /^[a-zA-Z0-9_-]+$/.test(trailerKey)) {
             modalTrailer.innerHTML = `
-                <a href="https://www.youtube.com/embed/${trailerKey}" title="Trailer de ${details.title}" target="_blank">
-                    <button class="btn-trailer"></button>
-                    
+                <a href="https://www.youtube.com/embed/${trailerKey}" title="Trailer de ${escapeHTML(details.title)}" target="_blank" rel="noopener noreferrer">
+                    <span class="btn-trailer">Assistir ao trailer</span>
+
                 </a>
             `;
         } else {
@@ -421,8 +416,7 @@ async function openModal(details) {
         }
     }
 
-    abrirChat();
-    await carregarResumoIA(details.id);
+
 }
 
 // === FECHAR MODAL ===
@@ -431,6 +425,8 @@ if (closeModalBtn) {
         if (modal) {
             modal.classList.add("hidden");
             document.body.style.overflow = "auto";
+            filmeAtual = null;
+            modalTrigger?.focus();
         }
     });
 }
@@ -438,8 +434,7 @@ if (closeModalBtn) {
 if (modal) {
     modal.addEventListener("click", (e) => {
         if (e.target === modal) {
-            modal.classList.add("hidden");
-            document.body.style.overflow = "auto";
+            closeModalBtn.click();
         }
     });
 }
@@ -574,4 +569,164 @@ document.addEventListener("DOMContentLoaded", function () {
     configurarEfeitoScrollNavbar();
     configurarSmoothScroll();
     configurarChat();
+});
+
+function escapeHTML(value) {
+    const element = document.createElement("span");
+    element.textContent = value || "";
+    return element.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, { ...options, signal: options.signal || AbortSignal.timeout(35000) });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.erro || "Não foi possível concluir a consulta.");
+    return data;
+}
+
+function abrirChat() {
+    document.getElementById("chatOverlay").style.display = "flex";
+    document.getElementById("chatInput").focus();
+}
+
+function fecharChat() {
+    document.getElementById("chatOverlay").style.display = "none";
+    document.getElementById("openChat").focus();
+}
+
+let sending = false;
+async function sendMessage() {
+    const input = document.getElementById("chatInput");
+    const message = input.value.trim();
+    if (!message || sending) return;
+    const messages = document.getElementById("chatMessages");
+    const append = (text) => {
+        const p = document.createElement("p");
+        p.textContent = text;
+        messages.appendChild(p);
+        messages.scrollTop = messages.scrollHeight;
+        return p;
+    };
+    append("Você: " + message);
+    input.value = "";
+    const pending = append("Viewy está respondendo…");
+    const button = document.querySelector("#chatInputArea button");
+    sending = true;
+    button.disabled = true;
+    try {
+        const data = await fetchJSON("/chat", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mensagem: message })
+        });
+        pending.textContent = "Viewy: " + data.resposta;
+    } catch (error) {
+        pending.textContent = error.message;
+        input.value = message;
+    } finally {
+        sending = false;
+        button.disabled = false;
+        messages.scrollTop = messages.scrollHeight;
+    }
+}
+
+function configurarChat() {
+    document.getElementById("openChat").addEventListener("click", abrirChat);
+    document.getElementById("chatInput").addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.isComposing) sendMessage();
+    });
+    document.addEventListener("keydown", event => {
+        const chatVisible = document.getElementById("chatOverlay").style.display !== "none";
+        const dialog = chatVisible ? document.getElementById("chatBox") :
+            (!modal.classList.contains("hidden") ? modal : null);
+        if (event.key === "Tab" && dialog) {
+            const controls = Array.from(dialog.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex="0"]'));
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        }
+        if (event.key !== "Escape") return;
+        if (document.getElementById("chatOverlay").style.display !== "none") fecharChat();
+        else if (!modal.classList.contains("hidden")) closeModalBtn.click();
+        document.getElementById("searchResultsOverlay").classList.add("hidden");
+    });
+    document.querySelectorAll(".movie-section > button, .carrossel > button").forEach(button => {
+        button.setAttribute("aria-label", button.textContent.trim() === "‹" ? "Ver filmes anteriores" : "Ver próximos filmes");
+    });
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll(".card-movie:not([tabindex])").forEach(card => {
+            card.tabIndex = 0;
+            card.setAttribute("role", "button");
+            card.setAttribute("aria-label", card.querySelector("img")?.alt || "Ver detalhes do filme");
+            card.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") { event.preventDefault(); card.click(); }
+            });
+        });
+    });
+    observer.observe(document.querySelector("main"), { childList: true, subtree: true });
+    observer.observe(document.getElementById("searchResults"), { childList: true, subtree: true });
+}
+
+
+function formatRating(movie) {
+    return movie.vote_count === 0 || !Number.isFinite(movie.vote_average)
+        ? "Sem nota" : `${movie.vote_average.toFixed(1).replace(".", ",")}/10`;
+}
+
+function createMovieCard(movie) {
+    const card = document.createElement("div");
+    card.className = "card-movie";
+    const image = document.createElement("img");
+    image.src = movie.poster_path ? imgBase + movie.poster_path : "/static/img/poster-placeholder.svg";
+    image.alt = movie.title || "Filme sem título";
+    image.loading = "lazy";
+    image.addEventListener("error", () => {
+        image.src = "/static/img/poster-placeholder.svg";
+    }, { once: true });
+    const title = document.createElement("h3");
+    title.textContent = movie.title;
+    const meta = document.createElement("div");
+    meta.className = "card-meta";
+    const year = document.createElement("span");
+    year.textContent = movie.release_date?.slice(0, 4) || "Sem data";
+    const rating = document.createElement("span");
+    rating.className = "rating";
+    rating.textContent = "★ " + formatRating(movie);
+    meta.append(year, rating);
+    card.append(image, title, meta);
+    card.addEventListener("click", () => showMovie(movie.id));
+    return card;
+}
+
+let movieRequest = 0;
+async function showMovie(id) {
+    const request = ++movieRequest;
+    try {
+        const details = await fetchJSON(`${baseUrl}/movie/${id}`);
+        if (request !== movieRequest) return;
+        openModal(details);
+    } catch (error) {
+        if (request !== movieRequest) return;
+        const container = document.getElementById("robotNotifications");
+        container.textContent = "Não foi possível carregar os detalhes. Tente novamente.";
+        clearTimeout(container.errorTimer);
+        container.errorTimer = setTimeout(() => { container.textContent = ""; }, 6000);
+    }
+}
+
+// O carrossel pausa enquanto a pessoa interage com seus controles.
+const carousel = document.querySelector(".carrossel");
+const pauseCarousel = () => clearInterval(carrosselInterval);
+const resumeCarousel = () => {
+    if (total > 1 && !document.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+        !carousel.contains(document.activeElement) && !carousel.matches(":hover")) configurarIntervaloMobile();
+};
+carousel.addEventListener("mouseenter", pauseCarousel);
+carousel.addEventListener("mouseleave", resumeCarousel);
+carousel.addEventListener("focusin", pauseCarousel);
+carousel.addEventListener("focusout", () => setTimeout(resumeCarousel, 0));
+document.addEventListener("visibilitychange", () => document.hidden ? pauseCarousel() : resumeCarousel());
+document.getElementById("closeSearch").addEventListener("click", () => {
+    document.getElementById("searchResultsOverlay").classList.add("hidden");
+    document.getElementById("query").focus();
 });
